@@ -1,0 +1,6 @@
+node_modules
+bot.zip
+.terraform
+*.tfvars
+*.tfstate
+*.tfstate.backup

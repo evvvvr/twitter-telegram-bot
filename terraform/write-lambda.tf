@@ -17,7 +17,7 @@ resource "aws_lambda_function" "write" {
     variables = {
       CONSUMER_KEY        = "${var.consumer_key}"
       CONSUMER_SECRET     = "${var.consumer_secret}"
-      ACCESS_TOKEN    = "${var.access_token}"
+      ACCESS_TOKEN        = "${var.access_token}"
       ACCESS_TOKEN_SECRET = "${var.access_token_secret}"
     }
   }

@@ -4,5 +4,7 @@
   "description": "",
   "author": "Volodymyr Galkin",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "twitter": "^1.7.1"
+  }
 }

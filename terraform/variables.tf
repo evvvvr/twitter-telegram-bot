@@ -17,3 +17,8 @@ variable "api_env_stage_name" {}
 
 variable "bot_token" {}
 variable "since_when" {}
+
+variable "consumer_key" {}
+variable "consumer_secret" {}
+variable "access_token" {}
+variable "access_token_secret" {}

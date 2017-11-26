@@ -4,6 +4,7 @@ console.log('Loading function\n');
 
 const fetch = require('node-fetch');
 const moment = require('moment');
+const AWS = require("aws-sdk");
 
 // config
 const BotToken = process.env.BOT_TOKEN;
@@ -47,7 +48,14 @@ exports.handler = (event, context, callback) => {
 
             case 'tweet':
               console.log(`Tweet! ${text}`);
-              return; 
+              return publishTweet(text)
+                .then(() => {
+                  return callback(null, response);
+                })
+                .catch(err => {
+                  console.log(`Error: ${err}`);
+                  return callback(err);
+                });
           }
         }
       }
@@ -70,4 +78,15 @@ function sendMessage (chatId, message) {
         text: message
       })
   });
+}
+
+const sns = new AWS.SNS();
+
+function publishTweet (text) {
+  const params = {
+    Message: text, 
+    TopicArn: ""
+  };
+
+  return sns.publish(params).promise();
 }

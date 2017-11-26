@@ -25,6 +25,13 @@
         "cloudwatch:List*"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "*"
     }
   ]
 }

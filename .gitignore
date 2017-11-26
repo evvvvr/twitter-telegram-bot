@@ -1,5 +1,5 @@
 node_modules
-bot.zip
+*.zip
 .terraform
 *.tfvars
 *.tfstate

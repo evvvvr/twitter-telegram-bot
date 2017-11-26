@@ -22,20 +22,33 @@ exports.handler = (event, context, callback) => {
       const sinceWhen = moment().subtract(SinceWhen, 'milliseconds');
 
       if (messageTime.isSameOrAfter(sinceWhen)) {
-        if (message.text.toLowerCase() === '/ping') {
-          sendMessage(message.chat.id, 'pong')
-            .then(res => {
-              if (!res.ok) {
-                throw Error(res.statusText);
-              }
+        const CmdRegExp = /\/(\w+)\s*(\w*)/g;
+        const cmdRegExpRes = CmdRegExp.exec(message.text);
 
-              console.log('Message posted')
-              return callback(null, response);
-            })
-            .catch(err => {
-              console.log(`Error: ${err}`);
-              return callback(err);
-            });
+        if (cmdRegExpRes) {
+          const cmd = cmdRegExpRes[1].toLowerCase();
+          const text = cmdRegExpRes[2];
+
+          switch (cmd) {
+            case 'ping':
+              return sendMessage(message.chat.id, 'pong')
+                .then(res => {
+                  if (!res.ok) {
+                    throw Error(res.statusText);
+                  }
+
+                  console.log('Message posted')
+                  return callback(null, response);
+                })
+                .catch(err => {
+                  console.log(`Error: ${err}`);
+                  return callback(err);
+                });
+
+            case 'tweet':
+              console.log(`Tweet! ${text}`);
+              return; 
+          }
         }
       }
     }

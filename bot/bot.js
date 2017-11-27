@@ -9,6 +9,7 @@ const AWS = require("aws-sdk");
 // config
 const BotToken = process.env.BOT_TOKEN;
 const SinceWhen = process.env.SINCE_WHEN;
+const WriteSnsARN = process.env.WRITE_SNS_ARN;
 
 const response = {
   statusCode: 200
@@ -85,7 +86,7 @@ const sns = new AWS.SNS();
 function publishTweet (text) {
   const params = {
     Message: text, 
-    TopicArn: ''
+    TopicArn: WriteSnsARN
   };
 
   return sns.publish(params).promise();

@@ -15,8 +15,9 @@ resource "aws_lambda_function" "inputHandler" {
 
   environment {
     variables = {
-      BOT_TOKEN  = "${var.bot_token}"
-      SINCE_WHEN = "${var.since_when}"
+      BOT_TOKEN     = "${var.bot_token}"
+      SINCE_WHEN    = "${var.since_when}"
+      WRITE_SNS_ARN = "${aws_sns_topic.write.arn}"
     }
   }
 }

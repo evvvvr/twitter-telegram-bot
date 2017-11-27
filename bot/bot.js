@@ -24,7 +24,7 @@ exports.handler = (event, context, callback) => {
     const sinceWhen = moment().subtract(SinceWhen, 'milliseconds');
 
     if (messageTime.isSameOrAfter(sinceWhen)) {
-      const CmdRegExp = /\/(\w+)\s*(\w*)/g;
+      const CmdRegExp = /\/(\w+)\s*([\s\S]*)/g;
       const cmdRegExpRes = CmdRegExp.exec(message.text);
 
       if (cmdRegExpRes) {

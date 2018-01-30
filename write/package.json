@@ -4,7 +4,20 @@
   "description": "",
   "author": "Volodymyr Galkin",
   "license": "MIT",
+  "scripts": {
+    "postinstall": "cp ../pre-commit.hook ../.git/hooks/pre-commit && chmod +x ../.git/hooks/pre-commit",
+    "format-js": "eslint . --fix || true",
+    "lint": "eslint . || true"
+  },
   "dependencies": {
     "twitter": "^1.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
   }
 }

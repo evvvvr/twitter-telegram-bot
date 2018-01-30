@@ -10,7 +10,7 @@ const OkResponse = {
 };
 const sns = new AWS.SNS();
 
-module.exports = (event) => {
+module.exports = event => {
   const {message} = event;
   const {cmd, text} = getCommand(event.message) || {};
 
@@ -35,7 +35,7 @@ module.exports = (event) => {
     return commandExecutor();
   }
 
-  return callback(null, OkResponse);
+  throw new Error('No command');
 };
 
 function getCommand (message) {
@@ -88,7 +88,7 @@ function tweet (text) {
 
   function publishTweet (text) {
     const params = {
-      Message: text, 
+      Message: text,
       TopicArn: config.WriteSnsARN
     };
 

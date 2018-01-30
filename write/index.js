@@ -7,5 +7,5 @@ const write = require('./src/write');
 exports.handler = (event, context) => {
   return write(event)
     .then(() => context.done(null, null))
-    .catch((err) => context.done(err, null));
+    .catch(err => context.done(err, null));
 };

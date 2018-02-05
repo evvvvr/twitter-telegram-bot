@@ -1,6 +1,5 @@
 'use strict';
 
-const fetch = require('node-fetch');
 const moment = require('moment');
 const AWS = require("aws-sdk");
 const config = require('./config');
@@ -20,7 +19,7 @@ module.exports = event => {
     let commandExecutor;
     switch (cmd) {
       case 'ping':
-        commandExecutor = () => pong(message.chat.id);
+        commandExecutor = () => sendMessage(message.chat.id, 'pong');
         break;
 
       case 'tweet':
@@ -28,7 +27,7 @@ module.exports = event => {
         break;
 
       default:
-        commandExecutor = () => unknowCommand(message.chat.id);
+        commandExecutor = () => sendMessage(message.chat.id, 'Unknown command');
         break;
     }
 
@@ -60,21 +59,6 @@ function getCommand (message) {
   return null;
 }
 
-function pong (chatId) {
-  return sendMessage(chatId, 'pong')
-    .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
-
-      return OkResponse;
-    })
-    .catch(err => {
-      console.log(`Error sending message: ${err}`);
-      throw err;
-    });
-}
-
 function tweet (text) {
   return publishTweet(text)
     .then(() => {
@@ -96,33 +80,18 @@ function tweet (text) {
   }
 }
 
-function unknowCommand (chatId) {
-  return sendMessage(chatId, 'Unknown command')
-    .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
+function sendMessage (chatId, text) {
+  const payload = JSON.stringify({chatId, text});
+  const params = {
+    Message: JSON.stringify({default: payload}),
+    MessageStructure: 'json',
+    TopicArn: config.SendSnsARN
+  };
 
-      return OkResponse;
-    })
+  return sns.publish(params).promise()
+    .then(() => OkResponse)
     .catch(err => {
       console.log(`Error sending message: ${err}`);
       throw err;
     });
-}
-
-function sendMessage (chatId, message) {
-  const url = `https://api.telegram.org/bot${config.BotToken}/sendMessage`;
-
-  return fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message
-    })
-  });
 }

@@ -5,5 +5,6 @@ module.exports = {
   ConsumerKey: process.env.CONSUMER_KEY,
   ConsumerSecret: process.env.CONSUMER_SECRET,
   AccessToken: process.env.ACCESS_TOKEN,
-  AccessTokenSecret: process.env.ACCESS_TOKEN_SECRET
+  AccessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
+  SendSnsARN: process.env.SEND_SNS_ARN
 };

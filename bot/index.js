@@ -4,10 +4,14 @@ console.log('Loading function');
 
 const bot = require('./src/bot');
 
+const OkResponse = {
+  statusCode: 200
+};
+
 module.exports.handler = (event, context, callback) => {
   console.log('Received event:', JSON.stringify(event, null, 2));
 
   return bot(event)
-    .then(response => callback(null, response))
+    .then(() => callback(null, OkResponse))
     .catch(err => callback(err));
 };

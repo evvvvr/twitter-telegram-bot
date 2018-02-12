@@ -4,9 +4,6 @@ const moment = require('moment');
 const AWS = require("aws-sdk");
 const config = require('./config');
 
-const OkResponse = {
-  statusCode: 200
-};
 const sns = new AWS.SNS();
 
 module.exports = event => {
@@ -16,22 +13,15 @@ module.exports = event => {
   if (cmd) {
     console.log(`Received '${cmd}' command`);
 
-    let commandExecutor;
     switch (cmd) {
       case 'ping':
-        commandExecutor = () => sendMessage(message.chat.id, 'pong');
-        break;
+        return sendMessage(message.chat.id, 'pong');
 
       case 'tweet':
-        commandExecutor = () => tweet(text);
-        break;
-
-      default:
-        commandExecutor = () => sendMessage(message.chat.id, 'Unknown command');
-        break;
+        return tweet(message.chat.id, text);
     }
 
-    return commandExecutor();
+    return sendMessage(message.chat.id, 'Unknown command');
   }
 
   throw new Error('No command');
@@ -59,24 +49,30 @@ function getCommand (message) {
   return null;
 }
 
-function tweet (text) {
-  return publishTweet(text)
+function tweet (chatId, tweet) {
+  return publishTweet(chatId, tweet)
     .then(() => {
       console.log('Tweet has been sent to be published');
-      return OkResponse;
     })
     .catch(err => {
       console.log(`Error publishing tweet: ${err}`);
       throw err;
     });
 
-  function publishTweet (text) {
+  function publishTweet (chatId, tweet) {
+    const payload = JSON.stringify({chatId, tweet});
+
     const params = {
-      Message: text,
+      Message: JSON.stringify({default: payload}),
+      MessageStructure: 'json',
       TopicArn: config.WriteSnsARN
     };
 
-    return sns.publish(params).promise();
+    return sns.publish(params).promise()
+      .catch(err => {
+        console.log(`Error publishing tweet: ${err}`);
+        throw err;
+      });
   }
 }
 
@@ -89,7 +85,6 @@ function sendMessage (chatId, text) {
   };
 
   return sns.publish(params).promise()
-    .then(() => OkResponse)
     .catch(err => {
       console.log(`Error sending message: ${err}`);
       throw err;

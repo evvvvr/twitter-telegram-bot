@@ -20,6 +20,7 @@ resource "aws_lambda_function" "write" {
       CONSUMER_SECRET     = "${var.consumer_secret}"
       ACCESS_TOKEN        = "${var.access_token}"
       ACCESS_TOKEN_SECRET = "${var.access_token_secret}"
+      SEND_SNS_ARN        = "${aws_sns_topic.send.arn}"
     }
   }
 }

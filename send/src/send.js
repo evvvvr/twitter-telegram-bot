@@ -3,18 +3,10 @@
 const fetch = require('node-fetch');
 const config = require('./config');
 
-module.exports = event => {
-  const message = event.Records[0].Sns.Message;
-
-  if (!message) {
-    return null;
-  }
-
-  const params = JSON.parse(message);
-
+module.exports = (chatId, text) => {
   console.log(`Sending message`);
 
-  return send(params.chatId, params.text)
+  return send(chatId, text)
     .then(res => {
       if (!res.ok) {
         throw Error(res.statusText);

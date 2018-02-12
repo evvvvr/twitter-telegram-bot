@@ -9,19 +9,20 @@ const sns = new AWS.SNS();
 module.exports = event => {
   const {message} = event;
   const {cmd, text} = getCommand(event.message) || {};
+  const chatId = message.chat ? message.chat.id : null;
 
   if (cmd) {
     console.log(`Received '${cmd}' command`);
 
     switch (cmd) {
       case 'ping':
-        return sendMessage(message.chat.id, 'pong');
+        return sendMessage(chatId, 'pong');
 
       case 'tweet':
-        return tweet(message.chat.id, text);
+        return tweet(chatId, text);
     }
 
-    return sendMessage(message.chat.id, 'Unknown command');
+    return sendMessage(chatId, 'Unknown command');
   }
 
   throw new Error('No command');
@@ -50,6 +51,11 @@ function getCommand (message) {
 }
 
 function tweet (chatId, tweet) {
+  if (!tweet) {
+    console.log(`Tweet can't be published: no text`);
+    return sendMessage(chatId, 'No tweet text');
+  }
+
   return publishTweet(chatId, tweet)
     .then(() => {
       console.log('Tweet has been sent to be published');

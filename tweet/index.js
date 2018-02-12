@@ -2,7 +2,7 @@
 
 console.log('Loading function');
 
-const write = require('./src/write');
+const tweet = require('./src/tweet');
 
 module.exports.handler = (event, context) => {
   const message = event.Records[0].Sns.Message;
@@ -13,7 +13,7 @@ module.exports.handler = (event, context) => {
 
   const params = JSON.parse(message);
 
-  return write(params.chatId, params.tweet)
+  return tweet(params.chatId, params.tweet)
     .then(() => context.done(null, null))
     .catch(err => context.done(err, null));
 };

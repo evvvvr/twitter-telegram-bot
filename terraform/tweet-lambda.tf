@@ -1,16 +1,16 @@
-data "archive_file" "write" {
+data "archive_file" "tweet" {
   type        = "zip"
-  source_dir  = "../write"
-  output_path = "write.zip"
+  source_dir  = "../tweet"
+  output_path = "tweet.zip"
 }
 
-resource "aws_lambda_function" "write" {
-  filename         = "${data.archive_file.write.output_path}"
-  function_name    = "telegramTwitterBotWrite"
+resource "aws_lambda_function" "tweet" {
+  filename         = "${data.archive_file.tweet.output_path}"
+  function_name    = "telegramTwitterBotTweet"
   role             = "${aws_iam_role.lambda-role.arn}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
-  source_code_hash = "${base64sha256(file("${data.archive_file.write.output_path}"))}"
+  source_code_hash = "${base64sha256(file("${data.archive_file.tweet.output_path}"))}"
   publish          = true
 
   environment {

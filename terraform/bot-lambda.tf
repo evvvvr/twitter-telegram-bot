@@ -1,7 +1,7 @@
 data "archive_file" "bot" {
   type        = "zip"
   source_dir  = "../bot"
-  output_path = "bot.zip"
+  output_path = "../dist/bot.zip"
 }
 
 resource "aws_lambda_function" "inputHandler" {

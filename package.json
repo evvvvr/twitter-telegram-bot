@@ -1,0 +1,16 @@
+{
+  "name": "twitter-telegram-bot",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Volodymyr Galkin",
+  "license": "MIT",
+  "scripts": {
+    "clean": "WORKING_DIR=bot npm run clean-project && WORKING_DIR=send npm run clean-project && WORKING_DIR=tweet npm run clean-project && rm -rf dist",
+    "clean-project": "cd $WORKING_DIR && rm -rf node_modules",
+    "build": "WORKING_DIR=bot npm run build-project && WORKING_DIR=send npm run build-project && WORKING_DIR=tweet npm run build-project",
+    "build-project": "cd $WORKING_DIR && npm install",
+    "lint": "WORKING_DIR=bot npm run lint-project && WORKING_DIR=send npm run lint-project && WORKING_DIR=tweet npm run lint-project",
+    "lint-project": "cd $WORKING_DIR && npm run lint",
+    "deploy": "npm run build && cd terraform && terraform apply -var-file='variables.tfvars'"
+  }
+}

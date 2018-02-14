@@ -1,7 +1,7 @@
 data "archive_file" "tweet" {
   type        = "zip"
   source_dir  = "../tweet"
-  output_path = "tweet.zip"
+  output_path = "../dist/tweet.zip"
 }
 
 resource "aws_lambda_function" "tweet" {

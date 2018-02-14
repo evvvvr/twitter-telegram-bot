@@ -1,7 +1,7 @@
 data "archive_file" "send" {
   type        = "zip"
   source_dir  = "../send"
-  output_path = "send.zip"
+  output_path = "../dist/send.zip"
 }
 
 resource "aws_lambda_function" "send" {

@@ -13,5 +13,10 @@ module.exports.handler = (event, context, callback) => {
 
   return bot(event)
     .then(() => callback(null, OkResponse))
-    .catch(err => callback(err));
+    .catch(err => {
+      console.log(`Error:`);
+      console.dir(err);
+
+      callback(err);
+    });
 };

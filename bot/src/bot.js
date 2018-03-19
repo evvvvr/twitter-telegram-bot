@@ -8,27 +8,36 @@ const sns = new AWS.SNS();
 
 module.exports = event => {
   const {message} = event;
-  const {cmd, text} = getCommand(event.message) || {};
+  const messageTime = moment.unix(message.date);
+  const sinceWhen = moment().subtract(config.SinceWhen, 'milliseconds');
+
+  if (!messageTime.isSameOrAfter(sinceWhen)) {
+    return;
+  }
+
+  const {cmd, text} = parseCommand(message) || {};
   const chatId = message.chat ? message.chat.id : null;
 
   if (cmd) {
     console.log(`Received '${cmd}' command`);
 
-    switch (cmd) {
-      case 'ping':
-        return sendMessage(chatId, 'pong');
-
-      case 'tweet':
-        return tweet(chatId, text);
+    if (cmd === 'ping') {
+      return executeCommand(cmd, {chatId, text});
     }
 
-    return sendMessage(chatId, 'Unknown command');
-  }
+    const isAuthorized = checkAuthorized();
 
-  throw new Error('No command');
+    if (!isAuthorized) {
+      return authorize().then(wasAuthorized => {
+        if (wasAuthorized) {
+          return executeCommand(cmd, {chatId, text});
+        }
+      });
+    }
+  }
 };
 
-function getCommand (message) {
+function parseCommand (message) {
   const CmdRegExp = /\/(\w+)\s*([\s\S]*)/g;
 
   if (message) {
@@ -48,6 +57,18 @@ function getCommand (message) {
   }
 
   return null;
+}
+
+function executeCommand (cmd, {chatId, text}) {
+  switch (cmd) {
+    case 'ping':
+      return sendMessage(chatId, 'pong');
+
+    case 'tweet':
+      return tweet(chatId, text);
+  }
+
+  return sendMessage(chatId, 'Unknown command');
 }
 
 function tweet (chatId, tweet) {
@@ -96,3 +117,12 @@ function sendMessage (chatId, text) {
       throw err;
     });
 }
+
+function checkAuthorized () {
+  return false;
+}
+
+function authorize () {
+  return Promise.resolve(true);
+}
+

@@ -11,29 +11,34 @@ module.exports = event => {
   const messageTime = moment.unix(message.date);
   const sinceWhen = moment().subtract(config.SinceWhen, 'milliseconds');
 
-  if (!messageTime.isSameOrAfter(sinceWhen)) {
-    return;
+  if (messageTime.isBefore(sinceWhen)) {
+    return Promise.resolve(null);
   }
 
   const {cmd, text} = parseCommand(message) || {};
-  const chatId = message.chat ? message.chat.id : null;
 
-  if (cmd) {
-    console.log(`Received '${cmd}' command`);
+  if (!cmd) {
+    return Promise.resolve(null);
+  }
 
-    if (cmd === 'ping') {
-      return executeCommand(cmd, {chatId, text});
-    }
+  console.log(`Received '${cmd}' command`);
 
-    const isAuthorized = checkAuthorized();
+  const { chat: { id: chatId } } = message;
 
-    if (!isAuthorized) {
-      return authorize().then(wasAuthorized => {
-        if (wasAuthorized) {
-          return executeCommand(cmd, {chatId, text});
-        }
-      });
-    }
+  if (cmd === 'ping') {
+    return executeCommand(cmd, {chatId, text});
+  }
+
+  const isAuthorized = checkAuthorized();
+
+  if (!isAuthorized) {
+    return authorize().then(wasAuthorized => {
+      if (wasAuthorized) {
+        return executeCommand(cmd, {chatId, text});
+      }
+    }).catch(() => {
+      return sendMessage(chatId, 'Error happened while executing the command');
+    });
   }
 };
 
@@ -125,4 +130,3 @@ function checkAuthorized () {
 function authorize () {
   return Promise.resolve(true);
 }
-

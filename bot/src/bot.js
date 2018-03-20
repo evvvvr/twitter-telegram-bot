@@ -15,6 +15,8 @@ module.exports = event => {
     return Promise.resolve(null);
   }
 
+  const { chat: { id: chatId }, from: { id: userId } } = message;
+
   const {cmd, text} = parseCommand(message) || {};
 
   if (!cmd) {
@@ -23,23 +25,32 @@ module.exports = event => {
 
   console.log(`Received '${cmd}' command`);
 
-  const { chat: { id: chatId } } = message;
-
   if (cmd === 'ping') {
     return executeCommand(cmd, {chatId, text});
   }
 
-  const isAuthorized = checkAuthorized();
-
-  if (!isAuthorized) {
-    return authorize().then(wasAuthorized => {
-      if (wasAuthorized) {
-        return executeCommand(cmd, {chatId, text});
+  return checkAuthorized(userId)
+    .then(isAuthorizedAlready => {
+      if (!isAuthorizedAlready) {
+        console.log(`Not authorized\n`);
+        return authorize();
+      } else {
+        console.log(`already authorized\n`);
+        return true;
       }
-    }).catch(() => {
+    })
+    .then(isAuthorized => {
+      if (!isAuthorized) {
+        return Promise.resolve({});
+      }
+
+      return executeCommand(cmd, {chatId, text});
+    })
+    .catch(e => {
+      console.log(`Error\n`);
+      console.dir(e);
       return sendMessage(chatId, 'Error happened while executing the command');
     });
-  }
 };
 
 function parseCommand (message) {
@@ -123,8 +134,23 @@ function sendMessage (chatId, text) {
     });
 }
 
-function checkAuthorized () {
-  return false;
+const docClient = new AWS.DynamoDB.DocumentClient();
+
+function checkAuthorized (userId) {
+  console.log(`checking if user ${userId} is authorized\n`);
+
+  const params = {
+    TableName : "authorizedUsers",
+    KeyConditionExpression: "userId = :userId",
+    FilterExpression: 'authorized = :authorized',
+    ExpressionAttributeValues: {
+      ":userId": userId,
+      ":authorized": true
+    }
+  };
+
+  return docClient.query(params).promise()
+    .then(data => data.Count !== 0);
 }
 
 function authorize () {

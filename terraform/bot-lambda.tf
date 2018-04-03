@@ -17,7 +17,7 @@ resource "aws_lambda_function" "inputHandler" {
     variables = {
       SINCE_WHEN    = "${var.since_when}"
       WRITE_SNS_ARN = "${aws_sns_topic.tweet.arn}"
-      SEND_SNS_ARN = "${aws_sns_topic.send.arn}"
+      SEND_SNS_ARN  = "${aws_sns_topic.send.arn}"
     }
   }
 }

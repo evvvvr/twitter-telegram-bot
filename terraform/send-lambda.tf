@@ -15,7 +15,7 @@ resource "aws_lambda_function" "send" {
 
   environment {
     variables = {
-      BOT_TOKEN           = "${var.bot_token}"
+      BOT_TOKEN = "${var.bot_token}"
     }
   }
 }

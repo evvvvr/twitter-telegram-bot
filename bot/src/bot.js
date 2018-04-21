@@ -2,9 +2,11 @@
 
 const moment = require('moment');
 const AWS = require("aws-sdk");
+const bcrypt = require('bcryptjs');
 const config = require('./config');
 
 const sns = new AWS.SNS();
+const docClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports = event => {
   const {message} = event;
@@ -15,42 +17,139 @@ module.exports = event => {
     return Promise.resolve(null);
   }
 
-  const { chat: { id: chatId }, from: { id: userId } } = message;
+  const { chat: { id: chatId }, from: { id: userId }, text } = message;
+  const {cmd, arg} = parseCommand(message) || {};
 
-  const {cmd, text} = parseCommand(message) || {};
-
-  if (!cmd) {
-    return Promise.resolve(null);
+  if (cmd) {
+    console.log(`Received '${cmd}' command from user ${userId}`);
   }
 
-  console.log(`Received '${cmd}' command`);
-
-  if (cmd === 'ping') {
-    return executeCommand(cmd, {chatId, text});
+  if (cmd === 'ping') { // no authorization required
+    return executeCommand(cmd, arg, {chatId});
   }
 
-  return checkAuthorized(userId)
-    .then(isAuthorizedAlready => {
-      if (!isAuthorizedAlready) {
-        console.log(`Not authorized\n`);
-        return authorize();
-      } else {
-        console.log(`already authorized\n`);
-        return true;
-      }
-    })
-    .then(isAuthorized => {
-      if (!isAuthorized) {
-        return Promise.resolve({});
+  return getUserInfo(userId).then(userInfo => {
+    if (!userInfo) {
+      if (!cmd) {
+        return Promise.resolve();
       }
 
-      return executeCommand(cmd, {chatId, text});
-    })
-    .catch(e => {
-      console.log(`Error\n`);
-      console.dir(e);
-      return sendMessage(chatId, 'Error happened while executing the command');
-    });
+      console.log(`No user info for user ${userId}`);
+
+      const params = {
+        TableName : 'users',
+        Item: {
+          id: userId,
+          authorized: false,
+          conversationPhase: 'AUTHORIZATION',
+          command: cmd !== 'authorize' ? cmd : null,
+          argument: cmd !== 'authorize' ? arg : null
+        }
+      };
+
+      return docClient.put(params).promise()
+        .then(() => sendMessage(chatId, 'Enter password'));
+      // if can't prompt to enter password - rollback prev steps
+    }
+
+    const {authorized, conversationPhase, command: prevCmd, argument: prevArg} =
+      userInfo;
+
+    if (!authorized) {
+      console.log(`User ${userId} is not authorized`);
+
+      if (conversationPhase !== 'AUTHORIZATION') {
+        if (!cmd) {
+          return Promise.resolve();
+        }
+
+        const params = {
+          TableName : 'users',
+          Item: {
+            id: userId,
+            authorized: false,
+            conversationPhase: 'AUTHORIZATION',
+            command: cmd !== 'authorize' ? cmd : null,
+            argument: cmd !== 'authorize' ? arg : null
+          }
+        };
+
+        return docClient.put(params).promise()
+          .then(() => sendMessage(chatId, 'Enter password'));
+        // if can't prompt to enter passwprd - rollback prev steps
+      }
+
+      // authorization
+      const passwordsMatch = bcrypt.compareSync(text, config.PasswordHash);
+
+      if (!passwordsMatch) {
+        console.log(`Failed authorization attempt for user ${userId}`);
+
+        const params = {
+          TableName : 'users',
+          Key: { id: userId },
+          AttributeUpdates: {
+            conversationPhase: {
+              Action: 'DELETE'
+            },
+            command: {
+              Action: 'DELETE'
+            },
+            argument: {
+              Action: 'DELETE'
+            }
+          }
+        };
+
+        return docClient.update(params).promise()
+          .then(() => sendMessage(chatId, 'Invalid password'));
+      }
+
+      console.log(`User ${userId} successfully authorized`);
+
+      const params = {
+        TableName : 'users',
+        Key: { id: userId },
+        AttributeUpdates: {
+          authorized: {
+            Action: 'PUT',
+            Value: true
+          },
+          conversationPhase: {
+            Action: 'PUT',
+            Value: 'RECIEVING_COMMANDS'
+          },
+          command: {
+            Action: 'DELETE'
+          },
+          argument: {
+            Action: 'DELETE'
+          }
+        }
+      };
+
+      return docClient.update(params).promise()
+        .then(() => {
+          if (prevCmd) {
+            return executeCommand(prevCmd, prevArg, {chatId});
+          }
+
+          return sendMessage(chatId, 'You are authorized');
+        });
+    }
+
+    // user is authorized
+    if (!cmd) {
+      return Promise.resolve();
+    }
+
+    if (cmd === 'authorize') {
+      return sendMessage(chatId, 'You are authorized already');
+    }
+
+    console.log(`Executing ${cmd} command`);
+    return executeCommand(cmd, arg, {chatId});
+  });
 };
 
 function parseCommand (message) {
@@ -66,7 +165,7 @@ function parseCommand (message) {
       if (cmdRegExpRes) {
         return {
           cmd: cmdRegExpRes[1].toLowerCase(),
-          text: cmdRegExpRes[2]
+          arg: cmdRegExpRes[2]
         };
       }
     }
@@ -75,13 +174,13 @@ function parseCommand (message) {
   return null;
 }
 
-function executeCommand (cmd, {chatId, text}) {
+function executeCommand (cmd, arg, {chatId}) {
   switch (cmd) {
     case 'ping':
       return sendMessage(chatId, 'pong');
 
     case 'tweet':
-      return tweet(chatId, text);
+      return tweet(chatId, arg);
   }
 
   return sendMessage(chatId, 'Unknown command');
@@ -134,25 +233,13 @@ function sendMessage (chatId, text) {
     });
 }
 
-const docClient = new AWS.DynamoDB.DocumentClient();
-
-function checkAuthorized (userId) {
-  console.log(`checking if user ${userId} is authorized\n`);
-
+function getUserInfo (userId) {
   const params = {
-    TableName : "authorizedUsers",
-    KeyConditionExpression: "userId = :userId",
-    FilterExpression: 'authorized = :authorized',
-    ExpressionAttributeValues: {
-      ":userId": userId,
-      ":authorized": true
+    TableName : 'users',
+    Key: {
+      id: userId
     }
   };
 
-  return docClient.query(params).promise()
-    .then(data => data.Count !== 0);
-}
-
-function authorize () {
-  return Promise.resolve(true);
+  return docClient.get(params).promise().then(res => res.Item || null);
 }

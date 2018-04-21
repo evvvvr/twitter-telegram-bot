@@ -10,6 +10,7 @@
     "lint": "eslint . || true"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "moment": "^2.19.2"
   },
   "devDependencies": {

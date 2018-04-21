@@ -18,6 +18,7 @@ resource "aws_lambda_function" "inputHandler" {
       SINCE_WHEN    = "${var.since_when}"
       WRITE_SNS_ARN = "${aws_sns_topic.tweet.arn}"
       SEND_SNS_ARN  = "${aws_sns_topic.send.arn}"
+      PASSWORD_HASH = "${var.password_hash}"
     }
   }
 }

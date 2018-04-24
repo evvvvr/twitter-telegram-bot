@@ -153,7 +153,7 @@ module.exports = event => {
 };
 
 function parseCommand (message) {
-  const CmdRegExp = /\/(\w+)\s*([\s\S]*)/g;
+  const CmdRegExp = /^\/(\w+)\s*([\s\S]*)/g;
 
   if (message) {
     const messageTime = moment.unix(message.date);

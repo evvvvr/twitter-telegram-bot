@@ -153,21 +153,15 @@ module.exports = event => {
 };
 
 function parseCommand (message) {
-  const CmdRegExp = /^\/(\w+)\s*([\s\S]*)/g;
-
   if (message) {
-    const messageTime = moment.unix(message.date);
-    const sinceWhen = moment().subtract(config.SinceWhen, 'milliseconds');
+    const CmdRegExp = /^\/(\w+)\s*([\s\S]*)/g;
+    const cmdRegExpRes = CmdRegExp.exec(message.text);
 
-    if (messageTime.isSameOrAfter(sinceWhen)) {
-      const cmdRegExpRes = CmdRegExp.exec(message.text);
-
-      if (cmdRegExpRes) {
-        return {
-          cmd: cmdRegExpRes[1].toLowerCase(),
-          arg: cmdRegExpRes[2]
-        };
-      }
+    if (cmdRegExpRes) {
+      return {
+        cmd: cmdRegExpRes[1].toLowerCase(),
+        arg: cmdRegExpRes[2]
+      };
     }
   }
 

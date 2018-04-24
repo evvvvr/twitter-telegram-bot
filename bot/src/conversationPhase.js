@@ -1,0 +1,6 @@
+'use strict';
+
+module.exports = {
+  AUTHORIZATION: 'AUTHORIZATION',
+  RECIEVING_COMMANDS: 'RECIEVING_COMMANDS'
+};

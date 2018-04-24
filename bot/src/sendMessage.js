@@ -1,11 +1,11 @@
 'use strict';
 
-const AWS = require("aws-sdk");
+const AWS = require('aws-sdk');
 const config = require('./config');
 
 const sns = new AWS.SNS();
 
-function sendMessage (chatId, text) {
+module.exports = (chatId, text) => {
   const payload = JSON.stringify({chatId, text});
   const params = {
     Message: JSON.stringify({default: payload}),
@@ -18,6 +18,4 @@ function sendMessage (chatId, text) {
       console.log(`Error sending message: ${err}`);
       throw err;
     });
-}
-
-module.exports = sendMessage;
+};

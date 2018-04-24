@@ -17,6 +17,6 @@ module.exports.handler = (event, context, callback) => {
       console.log(`Error:`);
       console.dir(err);
 
-      callback(err);
+      return callback(err);
     });
 };

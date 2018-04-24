@@ -16,7 +16,7 @@ const twitterClient = new Twitter({
 module.exports = (chatId, text) => {
   console.log(`Publishing tweet`);
 
-  return tweet(text)
+  return twitterClient.post('statuses/update', { status: text })
     .then(() => {
       console.log(`Tweet published`);
       return sendMessage(chatId, 'Tweet published');
@@ -27,10 +27,6 @@ module.exports = (chatId, text) => {
       return sendMessage(chatId, `Error publishing tweet`);
     });
 };
-
-function tweet (status) {
-  return twitterClient.post('statuses/update', { status });
-}
 
 function sendMessage (chatId, text) {
   const payload = JSON.stringify({chatId, text});

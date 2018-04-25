@@ -14,5 +14,5 @@ module.exports = (cmd, arg, {chatId}) => {
       return tweet(chatId, arg);
   }
 
-  return sendMessage(chatId, 'Unknown command');
+  throw new Error('unknown command');
 };

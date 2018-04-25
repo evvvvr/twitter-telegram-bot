@@ -4,8 +4,10 @@ const moment = require('moment');
 const db = require('./db');
 const authorize = require('./authorization');
 const executeCommand = require('./commands/executeCommand');
-const sendMessage = require('./sendMessage');
+const sendPrivateMessage = require('./sendPrivateMessage');
 const config = require('./config');
+
+const KnownCommands = ['ping', 'authorize', 'tweet'];
 
 module.exports = event => {
   const {message} = event;
@@ -16,10 +18,14 @@ module.exports = event => {
     return Promise.resolve();
   }
 
-  const { chat: { id: chatId }, from: { id: userId }, text } = message;
+  const {chat: {id: chatId}, from: {id: userId}} = message;
   const {cmd, arg} = parseCommand(message) || {};
 
   if (cmd) {
+    if (!KnownCommands.includes(cmd)) {
+      return Promise.resolve();
+    }
+
     console.log(`Received '${cmd}${arg ? ' ' + arg : ''}' command from user ${userId}`);
   }
 
@@ -29,7 +35,7 @@ module.exports = event => {
 
   return db.getUserInfo(userId).then(userInfo => {
     if (!userInfo || !userInfo.authorized) {
-      return authorize(userInfo, cmd, arg, {userId, chatId, messageText: text})
+      return authorize(userInfo, cmd, arg, message)
         .then(isAuthorized => {
           if (isAuthorized) {
             const {command: prevCmd, argument: prevArg} = userInfo;
@@ -49,7 +55,7 @@ module.exports = event => {
     }
 
     if (cmd === 'authorize') {
-      return sendMessage(chatId, 'You are authorized already');
+      return sendPrivateMessage(message, 'You are authorized already');
     }
 
     return executeCommand(cmd, arg, {chatId});

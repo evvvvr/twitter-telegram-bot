@@ -2,11 +2,13 @@
 
 const bcrypt = require('bcryptjs');
 const db = require('./db');
-const sendMessage = require('../sendMessage');
+const sendPrivateMessage = require('../sendPrivateMessage');
 const ConversationPhase = require('../conversationPhase');
 const config = require('../config');
 
-module.exports = (userInfo, cmd, arg, {userId, chatId, messageText}) => {
+module.exports = (userInfo, cmd, arg, messageInfo) => {
+  const {from: {id: userId}, text: messageText} = messageInfo;
+
   if (!userInfo) {
     if (!cmd) {
       return Promise.resolve(false);
@@ -14,7 +16,7 @@ module.exports = (userInfo, cmd, arg, {userId, chatId, messageText}) => {
 
     console.log(`No user info for user ${userId}`);
 
-    return startAuthorization(userId, cmd, arg, chatId)
+    return startAuthorization(userId, cmd, arg, messageInfo)
       .then(() => { return false; });
   }
 
@@ -30,7 +32,12 @@ module.exports = (userInfo, cmd, arg, {userId, chatId, messageText}) => {
       return Promise.resolve(false);
     }
 
-    return startAuthorization(userId, cmd, arg, chatId)
+    return startAuthorization(userId, cmd, arg, messageInfo)
+      .then(() => { return false; });
+  }
+
+  if (messageInfo.chat.type !== 'private') {
+    return sendPrivateMessage(messageInfo, 'Please, send password via private message only')
       .then(() => { return false; });
   }
 
@@ -39,28 +46,27 @@ module.exports = (userInfo, cmd, arg, {userId, chatId, messageText}) => {
   if (!passwordsMatch) {
     console.log(`Failed authorization attempt for user ${userId}`);
 
-    return failAuthorization(userId, chatId)
+    return failAuthorization(userId, messageInfo)
       .then(() => { return false; });
   }
 
   console.log(`User ${userId} successfully authorized`);
 
-  return succeedAuthorization(userId, prevCmd, prevArg, chatId)
+  return succeedAuthorization(userId, prevCmd, prevArg, messageInfo)
     .then(() => { return true; });
 };
 
-function startAuthorization (userId, cmd, arg, chatId) {
+function startAuthorization (userId, cmd, arg, messageInfo) {
   return db.saveAuthorizationStarted(userId, cmd, arg)
-    .then(() => sendMessage(chatId, 'Enter password'));
+    .then(() => sendPrivateMessage(messageInfo, 'Enter password'));
 }
 
-function failAuthorization (userId, chatId) {
+function failAuthorization (userId, messageInfo) {
   return db.saveAuthorizationFailed(userId)
-    .then(() => sendMessage(chatId, 'Invalid password'));
+    .then(() => sendPrivateMessage(messageInfo, 'Invalid password'));
 }
 
-function succeedAuthorization (userId, prevCmd, prevArg, chatId) {
+function succeedAuthorization (userId, prevCmd, prevArg, messageInfo) {
   return db.saveAuthorizationSucceeded(userId)
-    .then(() => sendMessage(chatId, 'You are authorized'));
+    .then(() => sendPrivateMessage(messageInfo, 'You are authorized'));
 }
-

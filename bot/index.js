@@ -8,15 +8,21 @@ const OkResponse = {
   statusCode: 200
 };
 
-module.exports.handler = (event, context, callback) => {
-  console.log('Received event:', JSON.stringify(event, null, 2));
+const ErrorResponse = {
+  statusCode: 500
+};
 
-  return bot(event)
+module.exports.handler = (event, context, callback) => {
+  const update = JSON.parse(event.body);
+
+  console.log('Received event:', JSON.stringify(update, null, 2));
+
+  return bot(update)
     .then(() => callback(null, OkResponse))
     .catch(err => {
       console.log(`Error:`);
       console.dir(err);
 
-      return callback(err);
+      return callback(null, ErrorResponse);
     });
 };

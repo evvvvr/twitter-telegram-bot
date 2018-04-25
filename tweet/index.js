@@ -4,16 +4,16 @@ console.log('Loading function');
 
 const tweet = require('./src/tweet');
 
-module.exports.handler = (event, context) => {
+module.exports.handler = (event, context, callback) => {
   const message = event.Records[0].Sns.Message;
 
   if (!message) {
-    return null;
+    return callback();
   }
 
   const params = JSON.parse(message);
 
   return tweet(params.chatId, params.tweet)
-    .then(() => context.done(null, null))
-    .catch(err => context.done(err, null));
+    .then(() => callback())
+    .catch(err => callback(err));
 };

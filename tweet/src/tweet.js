@@ -14,7 +14,7 @@ const twitterClient = new Twitter({
 });
 
 module.exports = (chatId, text) => {
-  console.log(`Publishing tweet`);
+  console.log(`Publishing tweet from chat ${chatId}`);
 
   return twitterClient.post('statuses/update', { status: text })
     .then(() => {

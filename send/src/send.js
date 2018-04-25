@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const config = require('./config');
 
 module.exports = (chatId, text) => {
-  console.log(`Sending message`);
+  console.log(`Sending message to chat ${chatId}`);
 
   return send(chatId, text)
     .then(res => {

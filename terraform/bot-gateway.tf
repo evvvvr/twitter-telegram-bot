@@ -21,25 +21,9 @@ resource "aws_api_gateway_integration" "telegramTwitterBot_integration" {
   resource_id             = "${aws_api_gateway_resource.webhook.id}"
   http_method             = "${aws_api_gateway_method.postToWebhook.http_method}"
   integration_http_method = "${aws_api_gateway_method.postToWebhook.http_method}"
-  type                    = "AWS"
+  type                    = "AWS_PROXY"
   uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.region}:${var.account_id}:function:${aws_lambda_function.inputHandler.function_name}/invocations"
   credentials             = "arn:aws:iam::${var.account_id}:role/${aws_iam_role.lambda-role.name}"
-}
-
-resource "aws_api_gateway_method_response" "200" {
-  rest_api_id = "${aws_api_gateway_rest_api.botWebhook.id}"
-  resource_id = "${aws_api_gateway_resource.webhook.id}"
-  http_method = "${aws_api_gateway_method.postToWebhook.http_method}"
-
-  status_code = "200"
-}
-
-resource "aws_api_gateway_integration_response" "webhook_response" {
-  depends_on  = ["aws_api_gateway_integration.telegramTwitterBot_integration"]
-  rest_api_id = "${aws_api_gateway_rest_api.botWebhook.id}"
-  resource_id = "${aws_api_gateway_resource.webhook.id}"
-  http_method = "${aws_api_gateway_method.postToWebhook.http_method}"
-  status_code = "${aws_api_gateway_method_response.200.status_code}"
 }
 
 resource "aws_api_gateway_deployment" "telegramTwitterBotHook_deploy" {

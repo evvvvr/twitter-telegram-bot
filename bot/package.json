@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "cp ../pre-commit.hook ../.git/hooks/pre-commit && chmod +x ../.git/hooks/pre-commit",
-    "format-js": "eslint . --fix || true",
-    "lint": "eslint . || true"
+    "lint": "eslint . || true",
+    "lint-fix": "eslint . --fix || true"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

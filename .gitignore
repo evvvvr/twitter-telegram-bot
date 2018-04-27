@@ -6,3 +6,4 @@ node_modules
 *.tfvars
 *.tfstate
 *.tfstate.backup
+*package-lock.json

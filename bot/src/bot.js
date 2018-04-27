@@ -33,20 +33,13 @@ module.exports = event => {
     return executeCommand(cmd, arg, {chatId});
   }
 
-  return db.getUserInfo(userId).then(userInfo => {
+  return db.getUserInfo(userId)
+    .then(authorizeOrExecuteCommand);
+
+  function authorizeOrExecuteCommand (userInfo) {
     if (!userInfo || !userInfo.authorized) {
       return authorize(userInfo, cmd, arg, message)
-        .then(isAuthorized => {
-          if (isAuthorized) {
-            const {command: prevCmd, argument: prevArg} = userInfo;
-
-            if (prevCmd) {
-              return executeCommand(prevCmd, prevArg, {chatId});
-            }
-          }
-
-          return Promise.resolve();
-        });
+        .then(executePrevCommandIfAuthorized);
     }
 
     // user authorized
@@ -59,7 +52,19 @@ module.exports = event => {
     }
 
     return executeCommand(cmd, arg, {chatId});
-  });
+
+    function executePrevCommandIfAuthorized (isAuthorized) {
+      if (isAuthorized) {
+        const {command: prevCmd, argument: prevArg} = userInfo;
+
+        if (prevCmd) {
+          return executeCommand(prevCmd, prevArg, {chatId});
+        }
+      }
+
+      return Promise.resolve();
+    }
+  }
 };
 
 function parseCommand (message) {

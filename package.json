@@ -5,8 +5,8 @@
   "author": "Volodymyr Galkin",
   "license": "MIT",
   "scripts": {
-    "clean": "WORKING_DIR=bot npm run clean-project && WORKING_DIR=send npm run clean-project && WORKING_DIR=tweet npm run clean-project && rm -rf dist",
-    "clean-project": "cd $WORKING_DIR && rm -rf node_modules",
+    "clean": "lerna clean",
+    "bootstrap": "lerna bootstrap",
     "build": "WORKING_DIR=bot npm run build-project && WORKING_DIR=send npm run build-project && WORKING_DIR=tweet npm run build-project",
     "build-project": "cd $WORKING_DIR && npm install",
     "lint": "WORKING_DIR=bot npm run lint-project && WORKING_DIR=send npm run lint-project && WORKING_DIR=tweet npm run lint-project",

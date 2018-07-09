@@ -1,6 +1,6 @@
 data "archive_file" "send" {
   type        = "zip"
-  source_dir  = "../send"
+  source_dir  = "../packages/send"
   output_path = "../dist/send.zip"
 }
 

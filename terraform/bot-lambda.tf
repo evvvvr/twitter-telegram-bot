@@ -1,6 +1,6 @@
 data "archive_file" "bot" {
   type        = "zip"
-  source_dir  = "../bot"
+  source_dir  = "../packages/bot"
   output_path = "../dist/bot.zip"
 }
 

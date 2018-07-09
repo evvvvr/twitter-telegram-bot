@@ -1,6 +1,6 @@
 data "archive_file" "tweet" {
   type        = "zip"
-  source_dir  = "../tweet"
+  source_dir  = "../packages/tweet"
   output_path = "../dist/tweet.zip"
 }
 

@@ -9,7 +9,9 @@
     "bootstrap": "npm install && lerna bootstrap",
     "postinstall": "cp pre-commit.hook .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
     "lint": "eslint . || true",
-    "lint-fix": "eslint . --fix || true"
+    "lint-fix": "eslint . --fix || true",
+    "deploy": "npm run bootstrap && cd terraform && terraform apply -var-file='variables.tfvars'",
+    "terraform-fmt": "cd terraform && terraform fmt"
   },
   "devDependencies": {
     "eslint": "^5.1.0",

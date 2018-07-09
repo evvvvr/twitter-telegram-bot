@@ -9,7 +9,7 @@ messages/publish tweets etc.
 
 ## Set-up
 1. Clone this repo
-2. Add `terraform/variables.tfvars` file (see [Config](#Config) section)
+2. Add `terraform/variables.tfvars` file (see [Config](#config) section)
 3. `cd <project root dir> && npm run deploy` 
 4. Previous step will output variable `webhook-url` containing URL of an AWS API Gateway endpoint  
   to be used as Telegram bot webhook URL.

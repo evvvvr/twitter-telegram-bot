@@ -5,15 +5,17 @@
   "author": "Volodymyr Galkin",
   "license": "MIT",
   "scripts": {
-    "clean": "lerna clean",
-    "bootstrap": "lerna bootstrap",
-    "build": "WORKING_DIR=bot npm run build-project && WORKING_DIR=send npm run build-project && WORKING_DIR=tweet npm run build-project",
-    "build-project": "cd $WORKING_DIR && npm install",
-    "lint": "WORKING_DIR=bot npm run lint-project && WORKING_DIR=send npm run lint-project && WORKING_DIR=tweet npm run lint-project",
-    "lint-project": "cd $WORKING_DIR && npm run lint",
-    "lint-fix": "WORKING_DIR=bot npm run lint-fix-project && WORKING_DIR=send npm run lint-fix-project && WORKING_DIR=tweet npm run lint-fix-project",
-    "lint-fix-project": "cd $WORKING_DIR && npm run lint-fix",
-    "deploy": "npm run build && cd terraform && terraform apply -var-file='variables.tfvars'",
-    "terraform-fmt": "cd terraform && terraform fmt"
+    "clean": "lerna clean && rm .git/hooks/pre-commit",
+    "bootstrap": "npm install && lerna bootstrap",
+    "postinstall": "cp pre-commit.hook .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
+    "lint": "eslint . || true"    
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0"
   }
 }

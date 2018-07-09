@@ -8,7 +8,8 @@
     "clean": "lerna clean && rm .git/hooks/pre-commit",
     "bootstrap": "npm install && lerna bootstrap",
     "postinstall": "cp pre-commit.hook .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
-    "lint": "eslint . || true"    
+    "lint": "eslint . || true",
+    "lint-fix": "eslint . --fix || true"
   },
   "devDependencies": {
     "eslint": "^5.1.0",

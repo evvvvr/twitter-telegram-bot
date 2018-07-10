@@ -4,8 +4,10 @@
   "description": "",
   "author": "Volodymyr Galkin",
   "license": "MIT",
+  "private": true,
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "moment": "^2.19.2"
+    "moment": "^2.19.2",
+    "send-api": "^1.0.0"
   }
 }

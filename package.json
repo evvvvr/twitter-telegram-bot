@@ -4,6 +4,7 @@
   "description": "",
   "author": "Volodymyr Galkin",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "clean": "lerna clean && rm .git/hooks/pre-commit",
     "bootstrap": "npm install && lerna bootstrap",

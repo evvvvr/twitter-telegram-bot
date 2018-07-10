@@ -4,7 +4,7 @@ const moment = require('moment');
 const db = require('./db');
 const authorize = require('./authorization');
 const executeCommand = require('./commands/executeCommand');
-const sendPrivateMessage = require('./sendPrivateMessage');
+const { sendPrivateMessage } = require('send-api');
 const config = require('./config');
 
 const KnownCommands = ['ping', 'authorize', 'tweet'];

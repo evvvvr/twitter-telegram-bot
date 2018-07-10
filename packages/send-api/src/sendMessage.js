@@ -13,6 +13,7 @@ module.exports = (chatId, text) => {
     TopicArn: config.SendSnsARN
   };
 
+  console.log(`send message api\n`);
   return sns.publish(params).promise()
     .catch(err => {
       console.log(`Error sending message: ${err}`);

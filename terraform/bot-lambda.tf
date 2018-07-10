@@ -1,16 +1,14 @@
-data "archive_file" "bot" {
-  type        = "zip"
-  source_dir  = "../packages/bot"
-  output_path = "../dist/bot.zip"
+data "external" "bot_zip" {
+  program = ["./zip.sh", "../dist/bot.zip", "../packages/bot"]
 }
 
 resource "aws_lambda_function" "inputHandler" {
-  filename         = "${data.archive_file.bot.output_path}"
+  filename         = "../dist/bot.zip"
   function_name    = "telegramTwitterBotInput"
   role             = "${aws_iam_role.lambda-role.arn}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
-  source_code_hash = "${base64sha256(file("${data.archive_file.bot.output_path}"))}"
+  source_code_hash = "${data.external.bot_zip.result.hash}"
   publish          = true
 
   environment {

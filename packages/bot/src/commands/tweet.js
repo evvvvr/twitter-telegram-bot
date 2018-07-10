@@ -1,7 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const sendMessage = require('../sendMessage');
+const { sendMessage } = require('send-api');
 const config = require('../config');
 
 const sns = new AWS.SNS();

@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const db = require('./db');
-const sendPrivateMessage = require('../sendPrivateMessage');
+const { sendPrivateMessage } = require('send-api');
 const ConversationPhase = require('../conversationPhase');
 const config = require('../config');
 

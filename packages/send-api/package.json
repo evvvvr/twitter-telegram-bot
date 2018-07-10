@@ -1,11 +1,8 @@
 {
-  "name": "send",
+  "name": "send-api",
   "version": "1.0.0",
   "description": "",
   "author": "Volodymyr Galkin",
   "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "node-fetch": "^1.7.3"
-  }
+  "private": true
 }

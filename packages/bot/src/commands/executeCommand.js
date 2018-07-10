@@ -1,6 +1,6 @@
 'useStrict';
 
-const sendMessage = require('../sendMessage');
+const { sendMessage } = require('send-api');
 const tweet = require('./tweet');
 
 module.exports = (cmd, arg, {chatId}) => {

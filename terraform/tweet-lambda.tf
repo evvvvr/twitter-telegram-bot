@@ -1,16 +1,14 @@
-data "archive_file" "tweet" {
-  type        = "zip"
-  source_dir  = "../packages/tweet"
-  output_path = "../dist/tweet.zip"
+data "external" "tweet_zip" {
+  program = ["./zip.sh", "../dist/tweet.zip", "../packages/tweet"]
 }
 
 resource "aws_lambda_function" "tweet" {
-  filename         = "${data.archive_file.tweet.output_path}"
+  filename         = "../dist/tweet.zip"
   function_name    = "telegramTwitterBotTweet"
   role             = "${aws_iam_role.lambda-role.arn}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
-  source_code_hash = "${base64sha256(file("${data.archive_file.tweet.output_path}"))}"
+  source_code_hash = "${data.external.tweet_zip.result.hash}"
   publish          = true
 
   environment {

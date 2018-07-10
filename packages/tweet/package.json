@@ -6,6 +6,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "send-api": "^1.0.0",
     "twitter": "^1.7.1"
   }
 }

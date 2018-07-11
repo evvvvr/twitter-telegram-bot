@@ -12,6 +12,7 @@
     "lint": "eslint . || true",
     "lint-fix": "eslint . --fix || true",
     "deploy": "npm run bootstrap && cd terraform && terraform apply -var-file='variables.tfvars'",
+    "terraform-init": "cd terraform && terraform init -var-file='variables.tfvars'",
     "terraform-fmt": "cd terraform && terraform fmt"
   },
   "devDependencies": {

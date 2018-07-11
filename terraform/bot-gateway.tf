@@ -22,8 +22,8 @@ resource "aws_api_gateway_integration" "telegramTwitterBot_integration" {
   http_method             = "${aws_api_gateway_method.postToWebhook.http_method}"
   integration_http_method = "${aws_api_gateway_method.postToWebhook.http_method}"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.region}:${var.account_id}:function:${aws_lambda_function.inputHandler.function_name}/invocations"
-  credentials             = "arn:aws:iam::${var.account_id}:role/${aws_iam_role.lambda-role.name}"
+  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${aws_lambda_function.inputHandler.function_name}/invocations"
+  credentials             = "arn:aws:iam::${var.aws_account_id}:role/${aws_iam_role.lambda-role.name}"
 }
 
 resource "aws_api_gateway_deployment" "telegramTwitterBotHook_deploy" {
@@ -33,5 +33,5 @@ resource "aws_api_gateway_deployment" "telegramTwitterBotHook_deploy" {
 }
 
 output "webhook-url" {
-  value = "https://${aws_api_gateway_deployment.telegramTwitterBotHook_deploy.rest_api_id}.execute-api.${var.region}.amazonaws.com/${aws_api_gateway_deployment.telegramTwitterBotHook_deploy.stage_name}/${aws_api_gateway_resource.webhook.path_part}"
+  value = "https://${aws_api_gateway_deployment.telegramTwitterBotHook_deploy.rest_api_id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_deployment.telegramTwitterBotHook_deploy.stage_name}/${aws_api_gateway_resource.webhook.path_part}"
 }

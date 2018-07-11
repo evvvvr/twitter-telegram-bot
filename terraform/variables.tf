@@ -5,14 +5,14 @@ variable "state_bucket_region" {
   default = "eu-central-1"
 }
 
-variable "access_key" {}
-variable "secret_key" {}
+variable "aws_access_key" {}
+variable "aws_secret_key" {}
 
-variable "region" {
+variable "aws_region" {
   default = "eu-central-1"
 }
 
-variable "account_id" {}
+variable "aws_account_id" {}
 variable "api_env_stage_name" {}
 
 variable "bot_token" {}

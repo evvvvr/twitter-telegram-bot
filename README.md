@@ -10,23 +10,24 @@ messages/publish tweets etc.
 ## Set-up
 1. Clone this repo
 2. Add `terraform/variables.tfvars` file (see [Config](#config) section)
-3. `cd <project root dir> && npm run deploy` 
-4. Previous step will output variable `webhook-url` containing URL of an AWS API Gateway endpoint  
-  to be used as Telegram bot webhook URL.
-5. Set-up webhook URL to be used (you need to do this once per URL):
+3. `cd <project root dir> && npm run terraform-init` to init Terraform 
+4. `cd <project root dir> && npm run deploy` 
+5. Previous step will output variable `webhook-url` containing URL of an AWS API Gateway endpoint  
+   to be used as Telegram bot webhook URL.
+6. Set-up webhook URL to be used (you need to do this once per URL):
   `curl -F "url=<webhook-url>" https://api.telegram.org/bot<bot-token>/setWebhook`
-6. To remove previously set webhook:
+7. To remove previously set webhook:
   `curl https://api.telegram.org/bot<bot-token>/setWebhook`
 
 ### Config
-- `account_id`            - AWS IAM account id to deploy bot
-- `access_key`            - AWS IAM account access key to deploy bot
-- `secret_key`            - AWS IAM account secret key to deploy bot
+- `aws_account_id`        - AWS IAM account id to deploy bot
+- `aws_access_key`        - AWS IAM account access key to deploy bot
+- `aws_secret_key`        - AWS IAM account secret key to deploy bot
 - `state_bucket`          - AWS S3 bucket name where to store Terraform state
 - `state_bucket_key`      - AWS S3 key for a Terraform state
 - `state_bucket_region`   - AWS region where S3 bucket with Terraform state is stored
-                          (default: 'eu-central-1')
-- `region`                - AWS region in which to deploy bot (default: 'eu-central-1')
+                            (default: 'eu-central-1')
+- `aws_region`            - AWS region in which to deploy bot (default: 'eu-central-1')
 - `api_env_stage_name`    - AWS API gateway stage name for bot's webhook deployment
 
 - `bot_token`             - Telegram bot token
